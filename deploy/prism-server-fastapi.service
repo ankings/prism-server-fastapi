@@ -1,0 +1,25 @@
+[Unit]
+Description=prism-server-fastapi FastAPI application
+After=network.target mysql.service redis.service
+Wants=mysql.service redis.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/prism-server-fastapi
+EnvironmentFile=/opt/prism-server-fastapi/.env
+ExecStart=/opt/prism-server-fastapi/.venv/bin/gunicorn app.main:app \
+    -k uvicorn.workers.UvicornWorker \
+    -w 4 \
+    --bind 127.0.0.1:8000 \
+    --access-logfile - \
+    --error-logfile - \
+    --timeout 30
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
